@@ -1,15 +1,20 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { mocked } from 'jest-mock';
-import { signIn } from "next-auth/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { mocked } from 'ts-jest/utils';
+import { signIn, useSession } from "next-auth/react";
 import { SubscribeButton } from ".";
 
 jest.mock("next-auth/react", () => {
   return {
     useSession() {
       return [null, false]
+    },
+    signIn() {
+      return undefined;
     }
   }
 });
+
+jest.mock('next/router');
 
 describe("SubscribeButton component", () => {
   it("renders correctly", () => {
@@ -18,17 +23,20 @@ describe("SubscribeButton component", () => {
     expect(screen.getByText("Subscribe Now")).toBeInTheDocument();
   });
 
-  it('redirects user to sign in when not authenticated', () => {
-    // const signInMocked = mocked(signIn);
+  it('redirects user to sign in when not authenticated', async () => {
+    const signInMocked = mocked(signIn);
 
-    const signInWasCalled = jest.fn(signIn);
+    const useSessionMocked = mocked(useSession)
 
-    render(<SubscribeButton />);
+    useSessionMocked.mockReturnValueOnce([, false])
 
-    const subscribeButton = screen.getByText("Subscribe Now");
 
-    fireEvent.click(subscribeButton)
+    render(<SubscribeButton />)
 
-    expect(signInWasCalled).toHaveBeenCalled()
+    const subscribeButton = screen.getByText('Subscribe now');
+
+    fireEvent.click(subscribeButton);
+
+    expect(signInMocked).toHaveBeenCalled()
   })
 });

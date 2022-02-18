@@ -7,11 +7,12 @@ import styles from './styles.module.scss';
 import { useRouter } from 'next/router';
 
 export function SubscribeButton() {
-    const { data: session } = useSession()
+    const { data: session } = useSession();
     const router = useRouter();
 
     async function handleSubscribe() {
         if (!session) {
+            console.log("Clicou")
             signIn('github')
             return;
         }
