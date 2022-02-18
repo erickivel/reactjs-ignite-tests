@@ -12,7 +12,6 @@ export function SubscribeButton() {
 
     async function handleSubscribe() {
         if (!session) {
-            console.log("Clicou")
             signIn('github')
             return;
         }
